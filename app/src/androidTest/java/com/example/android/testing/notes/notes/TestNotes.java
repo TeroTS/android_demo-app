@@ -1,46 +1,47 @@
 package com.example.android.testing.notes.notes;
 
-import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import com.example.android.testing.notes.R;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.*;
-import static android.support.test.espresso.matcher.ViewMatchers.*;
+import com.example.android.testing.notes.notes.pageObjects.*;
 
 
 @RunWith(AndroidJUnit4.class)
 public class TestNotes {
 
+    private MainPage mainPage;
+    private NewNotePage newNotePage;
+
     @Rule
     public ActivityTestRule<NotesActivity> mActivityTestRule = new ActivityTestRule<>(NotesActivity.class);
 
+    @Before
+    public void setup() {
+        mainPage = new MainPage();
+    }
+
     @Test
-    public void addNotes() {
-        for(int i=0;i<=7;i++) {
-            addNote(i);
-        }
-        ViewInteraction notesList = onView(withId(R.id.notes_list));
-        notesList.perform(swipeUp());
-        notesList.perform(swipeDown());
+    public void addNote() {
+        // Given application is open
+        //When user adds a note
+        newNotePage = mainPage.clickAddNote();
+        mainPage = newNotePage.addNote("Test note 0", "This is test note 0");
+        //Then user should see the note in main page
+        mainPage.checkNoteTitle("Test note 0");
     }
 
-    private void addNote(int idx) {
-        onView(withId(R.id.fab_add_notes)).perform(click());
-
-        String title = String.format("Test note %s", idx);
-        onView(withId(R.id.add_note_title)).perform(scrollTo(), replaceText(title), closeSoftKeyboard());
-
-        String note = String.format("This is test note %s", idx);
-        onView(withId(R.id.add_note_description)).perform(scrollTo(), replaceText(note), closeSoftKeyboard());
-
-        onView(withId(R.id.fab_add_notes)).perform(click());
+    @Test
+    public void addTwoNotes() {
+        // Given application is open
+        //When user adds two notes
+        newNotePage = mainPage.clickAddNote();
+        mainPage = newNotePage.addNote("Test note 1", "This is test note 1");
+        newNotePage = mainPage.clickAddNote();
+        mainPage = newNotePage.addNote("Test note 2", "This is test note 2");
+        //Then user should see notes in main page
+        mainPage.checkNoteTitle("Test note 1");
+        mainPage.checkNoteTitle("Test note 2");
     }
-
 
 }
